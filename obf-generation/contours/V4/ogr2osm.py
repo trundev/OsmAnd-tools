@@ -356,6 +356,10 @@ def getTransform(layer):
         destSpatialRef = osr.SpatialReference()
         # Destionation projection will *always* be EPSG:4326, WGS84 lat-lon
         destSpatialRef.ImportFromEPSG(4326)
+        # Fix axis swapping with GDAL 3.0, see:
+        # https://gdal.org/tutorials/osr_api_tut.html?highlight=coordinatetransformation#crs-and-axis-order
+        if hasattr(osr, 'OAMS_TRADITIONAL_GIS_ORDER'):
+            destSpatialRef.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
         coordTrans = osr.CoordinateTransformation(spatialRef, destSpatialRef)
         reproject = lambda geometry: geometry.Transform(coordTrans)
 
